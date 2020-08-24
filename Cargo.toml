@@ -1,0 +1,22 @@
+[package]
+name = "tge-ext"
+version = "0.0.0"
+authors = ["TakWolf <takwolf@foxmail.com>"]
+edition = "2018"
+description = "Extensions for the rust game engine tge."
+readme = "README.md"
+repository = "https://github.com/TakWolf/tge-ext"
+license = "MIT OR Apache-2.0"
+keywords = ["game", "graphics"]
+categories = ["game-engines"]
+exclude = ["examples/**", "assets/**"]
+publish = false
+
+[dependencies]
+tge = "0.0.3"
+
+[dev-dependencies]
+rand = "0.7.3"
+
+[profile.dev]
+opt-level = 3
