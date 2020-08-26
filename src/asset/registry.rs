@@ -77,6 +77,11 @@ impl AssetRegistry {
     pub fn remove(&mut self, name: impl AsRef<str>) -> Option<AssetHolder> {
         self.assets.remove(name.as_ref())
     }
+
+    pub fn with(mut self, name: impl Into<String>, asset: impl Into<AssetHolder>) -> GameResult<Self> {
+        self.insert(name, asset)?;
+        Ok(self)
+    }
 }
 
 impl ProgramProvider for AssetRegistry {
