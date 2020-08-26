@@ -92,6 +92,10 @@ impl AssetRegistry {
         self.assets.insert(name.into(), asset.into());
     }
 
+    pub fn contains(&mut self, name: impl AsRef<str>) -> bool {
+        self.assets.contains_key(name.as_ref())
+    }
+
     pub fn remove(&mut self, name: impl AsRef<str>) -> Option<AssetHolder> {
         self.assets.remove(name.as_ref())
     }
