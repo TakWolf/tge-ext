@@ -12,7 +12,7 @@ mod res {
 
 struct App {
     registry: AssetRegistry,
-    sheet: Vec<Sprite>,
+    animation: Animation,
 }
 
 impl App {
@@ -22,11 +22,14 @@ impl App {
             .load::<Texture>(engine, res::TEXTURE_CHARACTERS)?
             .load::<Font>(engine, res::FONT_ROBOTO)?
             .build();
-        let sheet = Sprite::by_texture(&registry, res::TEXTURE_CHARACTERS)?
-            .split(23, 4, Position::zero());
+        let animation = Animation::new(
+            12.0,
+            Sprite::by_texture(&registry, res::TEXTURE_CHARACTERS)?
+                .split(23, 4, Position::zero()),
+        );
         Ok(Self {
             registry,
-            sheet,
+            animation,
         })
     }
 }
@@ -35,6 +38,9 @@ impl Game for App {
     fn update(&mut self, engine: &mut Engine) -> GameResult {
         let title = format!("{} - FPS: {}", TITLE, engine.timer().real_time_fps().round());
         engine.window().set_title(title);
+
+        self.animation.update(engine);
+
         Ok(())
     }
 
@@ -56,11 +62,13 @@ impl Game for App {
             Transform::default()
                 .translate((10.0, 10.0)),
         );
-        let mut transform = Transform::default();
-        for sprite in &self.sheet {
-            sprite.draw(engine, &self.registry, transform)?;
-            transform = transform.translate((16.0, 16.0));
-        }
+        self.animation.draw(
+            engine,
+            &self.registry,
+            Transform::default()
+                .scale((4.0, 4.0))
+                .translate((400.0, 400.0)),
+        )?;
 
         Ok(())
     }
