@@ -34,7 +34,7 @@ impl Game for App {
         engine.graphics().clear(Color::WHITE);
 
         engine.graphics().draw_sprite(
-            self.registry.texture_ref(r::TEXTURE_FERRIS)?,
+            self.registry.texture(r::TEXTURE_FERRIS)?,
             None,
             Transform::default()
                 .scale((0.5, 0.5)),

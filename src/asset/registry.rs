@@ -33,23 +33,31 @@ impl From<Font> for AssetHolder {
 }
 
 pub trait ProgramProvider {
-    fn program(&mut self, name: impl AsRef<str>) -> GameResult<&mut Program>;
+    fn program(&self, name: impl AsRef<str>) -> GameResult<&Program>;
+
+    fn program_mut(&mut self, name: impl AsRef<str>) -> GameResult<&mut Program>;
 }
 
 pub trait TextureProvider {
-    fn texture(&mut self, name: impl AsRef<str>) -> GameResult<&mut Texture>;
+    fn texture(&self, name: impl AsRef<str>) -> GameResult<&Texture>;
+
+    fn texture_mut(&mut self, name: impl AsRef<str>) -> GameResult<&mut Texture>;
 }
 
 pub trait CanvasProvider {
-    fn canvas(&mut self, name: impl AsRef<str>) -> GameResult<&mut Canvas>;
+    fn canvas(&self, name: impl AsRef<str>) -> GameResult<&Canvas>;
+
+    fn canvas_mut(&mut self, name: impl AsRef<str>) -> GameResult<&mut Canvas>;
 }
 
 pub trait FontProvider {
-    fn font(&mut self, name: impl AsRef<str>) -> GameResult<&mut Font>;
+    fn font(&self, name: impl AsRef<str>) -> GameResult<&Font>;
+
+    fn font_mut(&mut self, name: impl AsRef<str>) -> GameResult<&mut Font>;
 }
 
 pub trait TextureRefProvider {
-    fn texture_ref(&mut self, name: impl AsRef<str>) -> GameResult<TextureRef>;
+    fn texture_ref(&self, name: impl AsRef<str>) -> GameResult<TextureRef>;
 }
 
 pub struct AssetRegistry {
@@ -105,7 +113,15 @@ impl AssetRegistry {
 }
 
 impl ProgramProvider for AssetRegistry {
-    fn program(&mut self, name: impl AsRef<str>) -> GameResult<&mut Program> {
+    fn program(&self, name: impl AsRef<str>) -> GameResult<&Program> {
+        match self.assets.get(name.as_ref()) {
+            Some(AssetHolder::Program(program)) => Ok(program),
+            None => Err(GameError::RuntimeError("asset not exists".into())),
+            _ => Err(GameError::RuntimeError("asset not a program".into())),
+        }
+    }
+
+    fn program_mut(&mut self, name: impl AsRef<str>) -> GameResult<&mut Program> {
         match self.assets.get_mut(name.as_ref()) {
             Some(AssetHolder::Program(program)) => Ok(program),
             None => Err(GameError::RuntimeError("asset not exists".into())),
@@ -115,7 +131,15 @@ impl ProgramProvider for AssetRegistry {
 }
 
 impl TextureProvider for AssetRegistry {
-    fn texture(&mut self, name: impl AsRef<str>) -> GameResult<&mut Texture> {
+    fn texture(&self, name: impl AsRef<str>) -> GameResult<&Texture> {
+        match self.assets.get(name.as_ref()) {
+            Some(AssetHolder::Texture(texture)) => Ok(texture),
+            None => Err(GameError::RuntimeError("asset not exists".into())),
+            _ => Err(GameError::RuntimeError("asset not a texture".into())),
+        }
+    }
+
+    fn texture_mut(&mut self, name: impl AsRef<str>) -> GameResult<&mut Texture> {
         match self.assets.get_mut(name.as_ref()) {
             Some(AssetHolder::Texture(texture)) => Ok(texture),
             None => Err(GameError::RuntimeError("asset not exists".into())),
@@ -125,7 +149,15 @@ impl TextureProvider for AssetRegistry {
 }
 
 impl CanvasProvider for AssetRegistry {
-    fn canvas(&mut self, name: impl AsRef<str>) -> GameResult<&mut Canvas> {
+    fn canvas(&self, name: impl AsRef<str>) -> GameResult<&Canvas> {
+        match self.assets.get(name.as_ref()) {
+            Some(AssetHolder::Canvas(canvas)) => Ok(canvas),
+            None => Err(GameError::RuntimeError("asset not exists".into())),
+            _ => Err(GameError::RuntimeError("asset not a canvas".into())),
+        }
+    }
+
+    fn canvas_mut(&mut self, name: impl AsRef<str>) -> GameResult<&mut Canvas> {
         match self.assets.get_mut(name.as_ref()) {
             Some(AssetHolder::Canvas(canvas)) => Ok(canvas),
             None => Err(GameError::RuntimeError("asset not exists".into())),
@@ -135,7 +167,15 @@ impl CanvasProvider for AssetRegistry {
 }
 
 impl FontProvider for AssetRegistry {
-    fn font(&mut self, name: impl AsRef<str>) -> GameResult<&mut Font> {
+    fn font(&self, name: impl AsRef<str>) -> GameResult<&Font> {
+        match self.assets.get(name.as_ref()) {
+            Some(AssetHolder::Font(font)) => Ok(font),
+            None => Err(GameError::RuntimeError("asset not exists".into())),
+            _ => Err(GameError::RuntimeError("asset not a font".into())),
+        }
+    }
+
+    fn font_mut(&mut self, name: impl AsRef<str>) -> GameResult<&mut Font> {
         match self.assets.get_mut(name.as_ref()) {
             Some(AssetHolder::Font(font)) => Ok(font),
             None => Err(GameError::RuntimeError("asset not exists".into())),
@@ -145,8 +185,8 @@ impl FontProvider for AssetRegistry {
 }
 
 impl TextureRefProvider for AssetRegistry {
-    fn texture_ref(&mut self, name: impl AsRef<str>) -> GameResult<TextureRef> {
-        match self.assets.get_mut(name.as_ref()) {
+    fn texture_ref(&self, name: impl AsRef<str>) -> GameResult<TextureRef> {
+        match self.assets.get(name.as_ref()) {
             Some(AssetHolder::Texture(texture)) => Ok(TextureRef::Texture(texture)),
             Some(AssetHolder::Canvas(canvas)) => Ok(TextureRef::Canvas(canvas)),
             Some(AssetHolder::Font(font)) => Ok(TextureRef::Font(font)),
