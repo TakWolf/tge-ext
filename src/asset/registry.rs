@@ -1,82 +1,7 @@
+use super::{AssetHolder, ProgramProvider, TextureProvider, CanvasProvider, FontProvider, TextureRefProvider, LoadableAsset};
 use tge::prelude::*;
 use std::collections::HashMap;
 use std::collections::hash_map::Entry;
-use std::path::Path;
-
-pub enum AssetHolder {
-    Program(Program),
-    Texture(Texture),
-    Canvas(Canvas),
-    Font(Font),
-}
-
-impl From<Program> for AssetHolder {
-    fn from(program: Program) -> Self {
-        Self::Program(program)
-    }
-}
-
-impl From<Texture> for AssetHolder {
-    fn from(texture: Texture) -> Self {
-        Self::Texture(texture)
-    }
-}
-
-impl From<Canvas> for AssetHolder {
-    fn from(canvas: Canvas) -> Self {
-        Self::Canvas(canvas)
-    }
-}
-
-impl From<Font> for AssetHolder {
-    fn from(font: Font) -> Self {
-        Self::Font(font)
-    }
-}
-
-pub trait ProgramProvider {
-    fn program(&self, name: impl AsRef<str>) -> GameResult<&Program>;
-
-    fn program_mut(&mut self, name: impl AsRef<str>) -> GameResult<&mut Program>;
-}
-
-pub trait TextureProvider {
-    fn texture(&self, name: impl AsRef<str>) -> GameResult<&Texture>;
-
-    fn texture_mut(&mut self, name: impl AsRef<str>) -> GameResult<&mut Texture>;
-}
-
-pub trait CanvasProvider {
-    fn canvas(&self, name: impl AsRef<str>) -> GameResult<&Canvas>;
-
-    fn canvas_mut(&mut self, name: impl AsRef<str>) -> GameResult<&mut Canvas>;
-}
-
-pub trait FontProvider {
-    fn font(&self, name: impl AsRef<str>) -> GameResult<&Font>;
-
-    fn font_mut(&mut self, name: impl AsRef<str>) -> GameResult<&mut Font>;
-}
-
-pub trait TextureRefProvider {
-    fn texture_ref(&self, name: impl AsRef<str>) -> GameResult<TextureRef>;
-}
-
-pub trait LoadableAsset {
-    fn load_asset(engine: &mut Engine, path: impl AsRef<Path>) -> GameResult<AssetHolder>;
-}
-
-impl LoadableAsset for Texture {
-    fn load_asset(engine: &mut Engine, path: impl AsRef<Path>) -> GameResult<AssetHolder> {
-        Self::load(engine, path).map(|texture| texture.into())
-    }
-}
-
-impl LoadableAsset for Font {
-    fn load_asset(engine: &mut Engine, path: impl AsRef<Path>) -> GameResult<AssetHolder> {
-        Self::load(engine, path).map(|font| font.into())
-    }
-}
 
 pub struct AssetRegistry {
     assets: HashMap<String, AssetHolder>,
@@ -123,7 +48,6 @@ impl AssetRegistry {
     pub fn remove(&mut self, name: impl AsRef<str>) -> Option<AssetHolder> {
         self.assets.remove(name.as_ref())
     }
-
 }
 
 impl ProgramProvider for AssetRegistry {
