@@ -1,6 +1,7 @@
 use tge::prelude::*;
 use std::collections::HashMap;
 use std::collections::hash_map::Entry;
+use std::path::Path;
 
 pub enum AssetHolder {
     Program(Program),
@@ -61,6 +62,22 @@ pub trait TextureRefProvider {
     fn texture_ref(&self, name: impl AsRef<str>) -> GameResult<TextureRef>;
 }
 
+pub trait LoadableAsset {
+    fn load_asset(engine: &mut Engine, path: impl AsRef<Path>) -> GameResult<AssetHolder>;
+}
+
+impl LoadableAsset for Texture {
+    fn load_asset(engine: &mut Engine, path: impl AsRef<Path>) -> GameResult<AssetHolder> {
+        Self::load(engine, path).map(|texture| texture.into())
+    }
+}
+
+impl LoadableAsset for Font {
+    fn load_asset(engine: &mut Engine, path: impl AsRef<Path>) -> GameResult<AssetHolder> {
+        Self::load(engine, path).map(|font| font.into())
+    }
+}
+
 pub struct AssetRegistry {
     assets: HashMap<String, AssetHolder>,
 }
@@ -87,6 +104,14 @@ impl AssetRegistry {
         Ok(())
     }
 
+    pub fn load<A: LoadableAsset>(&mut self, engine: &mut Engine, path: &str) -> GameResult {
+        self.insert(path.to_owned(), A::load_asset(engine, path)?)
+    }
+
+    pub fn load_once<A: LoadableAsset>(&mut self, engine: &mut Engine, path: &str) -> GameResult {
+        self.insert_once(path.to_owned(), || A::load_asset(engine, path))
+    }
+
     pub fn replace(&mut self, name: impl Into<String>, asset: impl Into<AssetHolder>) {
         self.assets.insert(name.into(), asset.into());
     }
@@ -99,25 +124,6 @@ impl AssetRegistry {
         self.assets.remove(name.as_ref())
     }
 
-    pub fn load_texture(&mut self, engine: &mut Engine, path: impl AsRef<str>) -> GameResult {
-        let path = path.as_ref();
-        self.insert(path.to_owned(), Texture::load(engine, path)?)
-    }
-
-    pub fn load_texture_once(&mut self, engine: &mut Engine, path: impl AsRef<str>) -> GameResult {
-        let path = path.as_ref();
-        self.insert_once(path.to_owned(), || Texture::load(engine, path))
-    }
-
-    pub fn load_font(&mut self, engine: &mut Engine, path: impl AsRef<str>) -> GameResult {
-        let path = path.as_ref();
-        self.insert(path.to_owned(), Font::load(engine, path)?)
-    }
-
-    pub fn load_font_once(&mut self, engine: &mut Engine, path: impl AsRef<str>) -> GameResult {
-        let path = path.as_ref();
-        self.insert_once(path.to_owned(), || Font::load(engine, path))
-    }
 }
 
 impl ProgramProvider for AssetRegistry {

@@ -15,8 +15,8 @@ struct App {
 impl App {
     fn new(engine: &mut Engine) -> GameResult<Self> {
         let mut registry = AssetRegistry::new();
-        registry.load_texture_once(engine, r::TEXTURE_FERRIS)?;
-        registry.load_font_once(engine, r::FONT_ROBOTO)?;
+        registry.load_once::<Texture>(engine, r::TEXTURE_FERRIS)?;
+        registry.load_once::<Font>(engine, r::FONT_ROBOTO)?;
         Ok(Self {
             registry,
         })
