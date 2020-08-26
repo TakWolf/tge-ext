@@ -3,7 +3,7 @@ use tge_ext::asset::*;
 
 const TITLE: &str = "Asset Registry";
 
-mod r {
+mod res {
     pub const TEXTURE_FERRIS: &str = "assets/ferris.png";
     pub const FONT_ROBOTO: &str = "assets/Roboto/Roboto-Regular.ttf";
 }
@@ -15,8 +15,8 @@ struct App {
 impl App {
     fn new(engine: &mut Engine) -> GameResult<Self> {
         let registry = AssetRegistry::builder()
-            .load::<Texture>(engine, r::TEXTURE_FERRIS)?
-            .load::<Font>(engine, r::FONT_ROBOTO)?
+            .load::<Texture>(engine, res::TEXTURE_FERRIS)?
+            .load::<Font>(engine, res::FONT_ROBOTO)?
             .build();
         Ok(Self {
             registry,
@@ -35,13 +35,13 @@ impl Game for App {
         engine.graphics().clear(Color::WHITE);
 
         engine.graphics().draw_sprite(
-            self.registry.texture(r::TEXTURE_FERRIS)?,
+            self.registry.texture(res::TEXTURE_FERRIS)?,
             None,
             Transform::default()
                 .scale((0.5, 0.5)),
         );
         engine.graphics().draw_text(
-            self.registry.font(r::FONT_ROBOTO)?,
+            self.registry.font(res::FONT_ROBOTO)?,
             "Hello world!",
             TextDrawParams::default()
                 .text_size(20.0)
