@@ -70,6 +70,16 @@ impl AssetRegistry {
         Ok(())
     }
 
+    pub fn load_texture(&mut self, engine: &mut Engine, path: impl AsRef<str>) -> GameResult {
+        let path = path.as_ref();
+        self.insert(path.to_owned(), Texture::load(engine, path)?)
+    }
+
+    pub fn load_font(&mut self, engine: &mut Engine, path: impl AsRef<str>) -> GameResult {
+        let path = path.as_ref();
+        self.insert(path.to_owned(), Font::load(engine, path)?)
+    }
+
     pub fn replace(&mut self, name: impl Into<String>, asset: impl Into<AssetHolder>) {
         self.assets.insert(name.into(), asset.into());
     }
@@ -80,6 +90,16 @@ impl AssetRegistry {
 
     pub fn with(mut self, name: impl Into<String>, asset: impl Into<AssetHolder>) -> GameResult<Self> {
         self.insert(name, asset)?;
+        Ok(self)
+    }
+
+    pub fn with_texture(mut self, engine: &mut Engine, path: impl AsRef<str>) -> GameResult<Self> {
+        self.load_texture(engine, path)?;
+        Ok(self)
+    }
+
+    pub fn with_font(mut self, engine: &mut Engine, path: impl AsRef<str>) -> GameResult<Self> {
+        self.load_font(engine, path)?;
         Ok(self)
     }
 }
