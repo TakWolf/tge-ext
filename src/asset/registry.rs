@@ -1,5 +1,6 @@
 use tge::prelude::*;
 use std::collections::HashMap;
+use std::collections::hash_map::Entry;
 
 pub enum AssetHolder {
     Program(Program),
@@ -78,14 +79,12 @@ impl AssetRegistry {
         Ok(())
     }
 
-    pub fn load_texture(&mut self, engine: &mut Engine, path: impl AsRef<str>) -> GameResult {
-        let path = path.as_ref();
-        self.insert(path.to_owned(), Texture::load(engine, path)?)
-    }
-
-    pub fn load_font(&mut self, engine: &mut Engine, path: impl AsRef<str>) -> GameResult {
-        let path = path.as_ref();
-        self.insert(path.to_owned(), Font::load(engine, path)?)
+    pub fn insert_once<A: Into<AssetHolder>, F: FnOnce() -> GameResult<A>>(&mut self, name: impl Into<String>, f: F) -> GameResult {
+        match self.assets.entry(name.into()) {
+            Entry::Occupied(entry) => entry.into_mut(),
+            Entry::Vacant(entry) => entry.insert(f()?.into()),
+        };
+        Ok(())
     }
 
     pub fn replace(&mut self, name: impl Into<String>, asset: impl Into<AssetHolder>) {
@@ -100,19 +99,24 @@ impl AssetRegistry {
         self.assets.remove(name.as_ref())
     }
 
-    pub fn with(mut self, name: impl Into<String>, asset: impl Into<AssetHolder>) -> GameResult<Self> {
-        self.insert(name, asset)?;
-        Ok(self)
+    pub fn load_texture(&mut self, engine: &mut Engine, path: impl AsRef<str>) -> GameResult {
+        let path = path.as_ref();
+        self.insert(path.to_owned(), Texture::load(engine, path)?)
     }
 
-    pub fn with_texture(mut self, engine: &mut Engine, path: impl AsRef<str>) -> GameResult<Self> {
-        self.load_texture(engine, path)?;
-        Ok(self)
+    pub fn load_texture_once(&mut self, engine: &mut Engine, path: impl AsRef<str>) -> GameResult {
+        let path = path.as_ref();
+        self.insert_once(path.to_owned(), || Texture::load(engine, path))
     }
 
-    pub fn with_font(mut self, engine: &mut Engine, path: impl AsRef<str>) -> GameResult<Self> {
-        self.load_font(engine, path)?;
-        Ok(self)
+    pub fn load_font(&mut self, engine: &mut Engine, path: impl AsRef<str>) -> GameResult {
+        let path = path.as_ref();
+        self.insert(path.to_owned(), Font::load(engine, path)?)
+    }
+
+    pub fn load_font_once(&mut self, engine: &mut Engine, path: impl AsRef<str>) -> GameResult {
+        let path = path.as_ref();
+        self.insert_once(path.to_owned(), || Font::load(engine, path))
     }
 }
 
