@@ -1,25 +1,32 @@
 use tge::prelude::*;
 use tge_ext::asset::*;
+use tge_ext::graphics::*;
 
 const TITLE: &str = "Asset Registry";
 
 mod res {
     pub const TEXTURE_FERRIS: &str = "assets/ferris.png";
+    pub const TEXTURE_CHARACTERS: &str = "assets/characters.png";
     pub const FONT_ROBOTO: &str = "assets/Roboto/Roboto-Regular.ttf";
 }
 
 struct App {
     registry: AssetRegistry,
+    sheet: Vec<Sprite>,
 }
 
 impl App {
     fn new(engine: &mut Engine) -> GameResult<Self> {
         let registry = AssetRegistry::builder()
             .load::<Texture>(engine, res::TEXTURE_FERRIS)?
+            .load::<Texture>(engine, res::TEXTURE_CHARACTERS)?
             .load::<Font>(engine, res::FONT_ROBOTO)?
             .build();
+        let sheet = Sprite::by_texture(&registry, res::TEXTURE_CHARACTERS)?
+            .split(23, 4, Position::zero());
         Ok(Self {
             registry,
+            sheet,
         })
     }
 }
@@ -49,6 +56,11 @@ impl Game for App {
             Transform::default()
                 .translate((10.0, 10.0)),
         );
+        let mut transform = Transform::default();
+        for sprite in &self.sheet {
+            sprite.draw(engine, &self.registry, transform)?;
+            transform = transform.translate((16.0, 16.0));
+        }
 
         Ok(())
     }
