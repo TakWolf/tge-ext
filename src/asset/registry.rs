@@ -14,6 +14,12 @@ impl AssetRegistry {
         }
     }
 
+    pub fn builder() -> AssetRegistryBuilder {
+        AssetRegistryBuilder {
+            registry: AssetRegistry::new(),
+        }
+    }
+
     pub fn insert(&mut self, name: impl Into<String>, asset: impl Into<AssetHolder>) -> GameResult {
         if self.assets.insert(name.into(), asset.into()).is_some() {
             return Err(GameError::RuntimeError("the asset already exists".into()));
@@ -21,7 +27,7 @@ impl AssetRegistry {
         Ok(())
     }
 
-    pub fn insert_once<A: Into<AssetHolder>, F: FnOnce() -> GameResult<A>>(&mut self, name: impl Into<String>, f: F) -> GameResult {
+    pub fn insert_once<N: Into<String>,A: Into<AssetHolder>, F: FnOnce() -> GameResult<A>>(&mut self, name: N, f: F) -> GameResult {
         match self.assets.entry(name.into()) {
             Entry::Occupied(entry) => entry.into_mut(),
             Entry::Vacant(entry) => entry.insert(f()?.into()),
@@ -131,5 +137,40 @@ impl TextureRefProvider for AssetRegistry {
             None => Ok(TextureRef::None),
             _ => Err(GameError::RuntimeError("asset not a texture ref".into())),
         }
+    }
+}
+
+pub struct AssetRegistryBuilder {
+    registry: AssetRegistry,
+}
+
+impl AssetRegistryBuilder {
+    pub fn insert(mut self, name: impl Into<String>, asset: impl Into<AssetHolder>) -> GameResult<Self> {
+        self.registry.insert(name, asset)?;
+        Ok(self)
+    }
+
+    pub fn insert_once<N: Into<String>, A: Into<AssetHolder>, F: FnOnce() -> GameResult<A>>(mut self, name: N, f: F) -> GameResult<Self> {
+        self.registry.insert_once(name, f)?;
+        Ok(self)
+    }
+
+    pub fn load<A: LoadableAsset>(mut self, engine: &mut Engine, path: &str) -> GameResult<Self> {
+        self.registry.load::<A>(engine, path)?;
+        Ok(self)
+    }
+
+    pub fn load_once<A: LoadableAsset>(mut self, engine: &mut Engine, path: &str) -> GameResult<Self> {
+        self.registry.load_once::<A>(engine, path)?;
+        Ok(self)
+    }
+
+    pub fn replace(mut self, name: impl Into<String>, asset: impl Into<AssetHolder>) -> Self {
+        self.registry.replace(name, asset);
+        self
+    }
+
+    pub fn build(self) -> AssetRegistry {
+        self.registry
     }
 }
