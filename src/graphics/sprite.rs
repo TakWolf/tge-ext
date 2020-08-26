@@ -87,8 +87,8 @@ impl Sprite {
         sheet
     }
 
-    pub fn draw(&self, engine: &mut Engine, provider: &impl TextureRefProvider, transform: impl Into<Option<Transform>>) -> GameResult {
-        engine.graphics().draw_sprite(
+    pub fn draw(&self, graphics: &mut Graphics, provider: &impl TextureRefProvider, transform: impl Into<Option<Transform>>) -> GameResult {
+        graphics.draw_sprite(
             provider.texture_ref(&self.res_name)?,
             SpriteDrawParams::default()
                 .region(self.region)

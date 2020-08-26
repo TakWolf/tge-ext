@@ -23,7 +23,7 @@ impl App {
             .load::<Font>(engine, res::FONT_ROBOTO)?
             .build();
         let animation = Animation::new(
-            12.0,
+            20.0,
             Sprite::by_texture(&registry, res::TEXTURE_CHARACTERS)?
                 .split(23, 4, Position::zero()),
         );
@@ -39,7 +39,10 @@ impl Game for App {
         let title = format!("{} - FPS: {}", TITLE, engine.timer().real_time_fps().round());
         engine.window().set_title(title);
 
-        self.animation.update(engine);
+        self.animation.update(engine.timer().delta_time());
+        if engine.mouse().is_button_hold(MouseButton::Left) {
+            self.animation.reset();
+        }
 
         Ok(())
     }
@@ -62,13 +65,15 @@ impl Game for App {
             Transform::default()
                 .translate((10.0, 10.0)),
         );
-        self.animation.draw(
-            engine,
-            &self.registry,
-            Transform::default()
-                .scale((4.0, 4.0))
-                .translate((400.0, 400.0)),
-        )?;
+        if let Some(position) = engine.mouse().position() {
+            self.animation.draw(
+                engine.graphics(),
+                &self.registry,
+                Transform::default()
+                    .scale((4.0, 4.0))
+                    .translate(position),
+            )?;
+        }
 
         Ok(())
     }

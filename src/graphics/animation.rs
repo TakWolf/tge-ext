@@ -73,8 +73,13 @@ impl Animation {
         self.since_last_frame = Duration::new(0, 0);
     }
 
-    pub fn update(&mut self, engine: &mut Engine) {
-        self.since_last_frame += engine.timer().delta_time();
+    pub fn reset(&mut self) {
+        self.current_index = 0;
+        self.since_last_frame = Duration::new(0, 0);
+    }
+
+    pub fn update(&mut self, delta_time: Duration) {
+        self.since_last_frame += delta_time;
         if self.since_last_frame.as_secs_f32() >= 1.0 / self.fps {
             self.since_last_frame = Duration::new(0, 0);
             self.current_index += 1;
@@ -84,9 +89,9 @@ impl Animation {
         }
     }
 
-    pub fn draw(&self, engine: &mut Engine, provider: &impl TextureRefProvider, transform: impl Into<Option<Transform>>) -> GameResult {
+    pub fn draw(&self, graphics: &mut Graphics, provider: &impl TextureRefProvider, transform: impl Into<Option<Transform>>) -> GameResult {
         if let Some(frame) = self.frames.get(self.current_index) {
-            frame.draw(engine, provider, transform)?;
+            frame.draw(graphics, provider, transform)?;
         }
         Ok(())
     }
