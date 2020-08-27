@@ -6,7 +6,7 @@
 
 Extensions for the rust game engine [tge](https://github.com/TakWolf/tge).
 
-WIP
+__WIP__
 
 ## License
 
