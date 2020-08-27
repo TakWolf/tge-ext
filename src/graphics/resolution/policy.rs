@@ -1,6 +1,6 @@
 use tge::prelude::*;
 
-pub struct FitResolutionParams {
+pub(crate) struct FitResolutionParams {
     pub canvas_size: Size,
     pub canvas_scale: Vector,
     pub viewport: Viewport,
@@ -18,7 +18,7 @@ pub enum ResolutionPolicy {
 }
 
 impl ResolutionPolicy {
-    pub fn calculate_fit_params(&self, graphics: &Graphics) -> FitResolutionParams {
+    pub(crate) fn calculate_fit_params(&self, graphics: &Graphics) -> FitResolutionParams {
         let graphics_size = graphics.size();
         match self {
             Self::Normal => {
