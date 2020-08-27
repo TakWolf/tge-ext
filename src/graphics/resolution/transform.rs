@@ -86,13 +86,12 @@ impl ResolutionAdapter for TransformResolutionAdapter {
         self.measure(graphics);
         self.locked = true;
         graphics.set_viewport(Some(self.params.viewport));
-        graphics.push_transform();
         graphics.set_transform(self.transform);
     }
 
     fn end(&mut self, graphics: &mut Graphics) {
         assert!(self.locked, "`begin()` must be called before `end()`");
-        graphics.pop_transform();
+        graphics.set_transform(Transform::identity());
         graphics.set_viewport(Viewport::none());
         self.locked = false;
     }
