@@ -10,10 +10,10 @@ pub struct CanvasResolutionAdapter {
 }
 
 impl CanvasResolutionAdapter {
-    pub fn new(engine: &mut Engine, policy: ResolutionPolicy) -> GameResult<Self> {
-        let graphics_size = engine.graphics().size();
+    pub fn new(graphics: &mut Graphics, policy: ResolutionPolicy) -> GameResult<Self> {
+        let graphics_size = graphics.size();
         let params = policy.calculate_params(graphics_size);
-        let canvas = Canvas::new(engine, (params.canvas_size.width.ceil() as u32, params.canvas_size.height.ceil() as u32))?;
+        let canvas = Canvas::new(graphics, (params.canvas_size.width.ceil() as u32, params.canvas_size.height.ceil() as u32))?;
         Ok(Self {
             policy,
             graphics_size,

@@ -22,7 +22,7 @@ impl App {
             .load::<Font>(engine, res::FONT_ROBOTO)?
             .build();
         let design_size = Size::new(320.0, 256.0);
-        let resolution_adapter = CanvasResolutionAdapter::new(engine, ResolutionPolicy::Normal)?;
+        let resolution_adapter = CanvasResolutionAdapter::new(engine.graphics(), ResolutionPolicy::Normal)?;
         Ok(Self {
             registry,
             design_size,
