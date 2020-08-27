@@ -75,7 +75,7 @@ impl ResolutionAdapter for TransformResolutionAdapter {
         graphics.draw_sprite(
             TextureRef::None,
             SpriteDrawParams::default()
-                .region(self.params.viewport)
+                .region((0.0, 0.0, self.params.canvas_size.width, self.params.canvas_size.height))
                 .color(color),
             None,
         );
