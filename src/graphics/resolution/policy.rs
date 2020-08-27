@@ -1,6 +1,6 @@
 use tge::prelude::*;
 
-pub(crate) struct FitResolutionParams {
+pub(crate) struct ResolutionAdaptParams {
     pub canvas_size: Size,
     pub canvas_scale: Vector,
     pub viewport: Viewport,
@@ -18,11 +18,11 @@ pub enum ResolutionPolicy {
 }
 
 impl ResolutionPolicy {
-    pub(crate) fn calculate_fit_params(&self, graphics: &Graphics) -> FitResolutionParams {
+    pub(crate) fn calculate_params(&self, graphics: &Graphics) -> ResolutionAdaptParams {
         let graphics_size = graphics.size();
         match self {
             Self::Normal => {
-                FitResolutionParams {
+                ResolutionAdaptParams {
                     canvas_size: graphics_size,
                     canvas_scale: Vector::new(1.0, 1.0),
                     viewport: Viewport::position_size(Position::zero(), graphics_size),
@@ -34,7 +34,7 @@ impl ResolutionPolicy {
                     (graphics_size.width - design_size.width) / 2.0,
                     (graphics_size.height - design_size.height) / 2.0,
                 );
-                FitResolutionParams {
+                ResolutionAdaptParams {
                     canvas_size: design_size,
                     canvas_scale: Vector::new(1.0, 1.0),
                     viewport: Viewport::position_size(viewport_position, design_size),
@@ -46,7 +46,7 @@ impl ResolutionPolicy {
                     graphics_size.width / design_size.width,
                     graphics_size.height / design_size.height,
                 );
-                FitResolutionParams {
+                ResolutionAdaptParams {
                     canvas_size: design_size,
                     canvas_scale,
                     viewport: Viewport::position_size(Position::zero(), graphics_size),
@@ -78,7 +78,7 @@ impl ResolutionPolicy {
                         0.0,
                     );
                 }
-                FitResolutionParams {
+                ResolutionAdaptParams {
                     canvas_size: design_size,
                     canvas_scale: Vector::new(canvas_scale, canvas_scale),
                     viewport: Viewport::position_size(viewport_position, viewport_size),
@@ -110,7 +110,7 @@ impl ResolutionPolicy {
                         (graphics_size.height - viewport_size.height) / 2.0,
                     );
                 }
-                FitResolutionParams {
+                ResolutionAdaptParams {
                     canvas_size: design_size,
                     canvas_scale: Vector::new(canvas_scale, canvas_scale),
                     viewport: Viewport::position_size(viewport_position, viewport_size),
@@ -123,7 +123,7 @@ impl ResolutionPolicy {
                     design_width,
                     graphics_size.height / canvas_scale,
                 );
-                FitResolutionParams {
+                ResolutionAdaptParams {
                     canvas_size,
                     canvas_scale: Vector::new(canvas_scale, canvas_scale),
                     viewport: Viewport::position_size(Position::zero(), graphics_size),
@@ -136,7 +136,7 @@ impl ResolutionPolicy {
                     graphics_size.width / canvas_scale,
                     design_height,
                 );
-                FitResolutionParams {
+                ResolutionAdaptParams {
                     canvas_size,
                     canvas_scale: Vector::new(canvas_scale, canvas_scale),
                     viewport: Viewport::position_size(Position::zero(), graphics_size),
