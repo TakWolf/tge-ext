@@ -1,5 +1,5 @@
 mod policy;
-
-use policy::FitResolutionParams;
+mod adapter;
 
 pub use policy::ResolutionPolicy;
+pub use adapter::ResolutionAdapter;
