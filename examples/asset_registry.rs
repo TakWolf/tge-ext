@@ -5,23 +5,25 @@ use tge_ext::graphics::*;
 const TITLE: &str = "Asset Registry";
 
 mod res {
-    pub const TEXTURE_FERRIS: &str = "assets/ferris.png";
+    pub const TEXTURE_SKY: &str = "assets/sky.png";
     pub const TEXTURE_CHARACTERS: &str = "assets/characters.png";
     pub const FONT_ROBOTO: &str = "assets/Roboto/Roboto-Regular.ttf";
 }
 
 struct App {
     registry: AssetRegistry,
+    design_size: Size,
     animation: Animation,
 }
 
 impl App {
     fn new(engine: &mut Engine) -> GameResult<Self> {
         let registry = AssetRegistry::builder()
-            .load::<Texture>(engine, res::TEXTURE_FERRIS)?
+            .load::<Texture>(engine, res::TEXTURE_SKY)?
             .load::<Texture>(engine, res::TEXTURE_CHARACTERS)?
             .load::<Font>(engine, res::FONT_ROBOTO)?
             .build();
+        let design_size = Size::new(320.0, 256.0);
         let animation = Animation::new(
             20.0,
             Sprite::by_texture(&registry, res::TEXTURE_CHARACTERS)?
@@ -29,6 +31,7 @@ impl App {
         );
         Ok(Self {
             registry,
+            design_size,
             animation,
         })
     }
@@ -40,21 +43,17 @@ impl Game for App {
         engine.window().set_title(title);
 
         self.animation.update(engine.timer().delta_time());
-        if engine.mouse().is_button_hold(MouseButton::Left) {
-            self.animation.reset();
-        }
 
         Ok(())
     }
 
     fn render(&mut self, engine: &mut Engine) -> GameResult {
-        engine.graphics().clear(Color::WHITE);
+        engine.graphics().clear(Color::BLACK);
 
         engine.graphics().draw_sprite(
-            self.registry.texture(res::TEXTURE_FERRIS)?,
+            self.registry.texture(res::TEXTURE_SKY)?,
             None,
-            Transform::default()
-                .scale((0.5, 0.5)),
+            None,
         );
         engine.graphics().draw_text(
             self.registry.font(res::FONT_ROBOTO)?,
@@ -65,15 +64,12 @@ impl Game for App {
             Transform::default()
                 .translate((10.0, 10.0)),
         );
-        if let Some(position) = engine.mouse().position() {
-            self.animation.draw(
-                engine.graphics(),
-                &self.registry,
-                Transform::default()
-                    .scale((4.0, 4.0))
-                    .translate(position),
-            )?;
-        }
+        self.animation.draw(
+            engine.graphics(),
+            &self.registry,
+            Transform::default()
+                .translate((100.0, 100.0)),
+        )?;
 
         Ok(())
     }
