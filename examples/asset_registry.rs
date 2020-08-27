@@ -13,6 +13,7 @@ mod res {
 struct App {
     registry: AssetRegistry,
     design_size: Size,
+    resolution_adapter: CanvasResolutionAdapter,
     animation: Animation,
 }
 
@@ -24,6 +25,7 @@ impl App {
             .load::<Font>(engine, res::FONT_ROBOTO)?
             .build();
         let design_size = Size::new(320.0, 256.0);
+        let resolution_adapter = CanvasResolutionAdapter::new(engine, ResolutionPolicy::Normal)?;
         let animation = Animation::new(
             20.0,
             Sprite::by_texture(&registry, res::TEXTURE_CHARACTERS)?
@@ -32,6 +34,7 @@ impl App {
         Ok(Self {
             registry,
             design_size,
+            resolution_adapter,
             animation,
         })
     }
@@ -44,11 +47,29 @@ impl Game for App {
 
         self.animation.update(engine.timer().delta_time());
 
+        if engine.keyboard().is_key_down(KeyCode::Num1) {
+            self.resolution_adapter.set_policy(ResolutionPolicy::Normal);
+        } else if engine.keyboard().is_key_down(KeyCode::Num2) {
+            self.resolution_adapter.set_policy(ResolutionPolicy::Center(self.design_size));
+        } else if engine.keyboard().is_key_down(KeyCode::Num3) {
+            self.resolution_adapter.set_policy(ResolutionPolicy::Stretch(self.design_size));
+        } else if engine.keyboard().is_key_down(KeyCode::Num4) {
+            self.resolution_adapter.set_policy(ResolutionPolicy::Inside(self.design_size));
+        } else if engine.keyboard().is_key_down(KeyCode::Num5) {
+            self.resolution_adapter.set_policy(ResolutionPolicy::Crop(self.design_size));
+        } else if engine.keyboard().is_key_down(KeyCode::Num6) {
+            self.resolution_adapter.set_policy(ResolutionPolicy::FixedWidth(self.design_size.width));
+        } else if engine.keyboard().is_key_down(KeyCode::Num7) {
+            self.resolution_adapter.set_policy(ResolutionPolicy::FixedHeight(self.design_size.height));
+        }
+
         Ok(())
     }
 
     fn render(&mut self, engine: &mut Engine) -> GameResult {
         engine.graphics().clear(Color::BLACK);
+        self.resolution_adapter.begin(engine.graphics());
+        self.resolution_adapter.clear(engine.graphics(), Color::BLUE);
 
         engine.graphics().draw_sprite(
             self.registry.texture(res::TEXTURE_SKY)?,
@@ -57,12 +78,10 @@ impl Game for App {
         );
         engine.graphics().draw_text(
             self.registry.font(res::FONT_ROBOTO)?,
-            "Hello world!",
+            &format!("Press Num1 ~ Num7 to switch resolution policy\nCurrent policy: {}", self.resolution_adapter.policy()),
             TextDrawParams::default()
-                .text_size(20.0)
                 .color(Color::BLACK),
-            Transform::default()
-                .translate((10.0, 10.0)),
+            None,
         );
         self.animation.draw(
             engine.graphics(),
@@ -71,6 +90,7 @@ impl Game for App {
                 .translate((100.0, 100.0)),
         )?;
 
+        self.resolution_adapter.end(engine.graphics());
         Ok(())
     }
 }

@@ -1,7 +1,12 @@
+mod params;
 mod policy;
 mod adapter;
+mod canvas;
+mod transform;
 
-use policy::ResolutionAdaptParams;
+use params::ResolutionAdaptParams;
 
 pub use policy::ResolutionPolicy;
 pub use adapter::ResolutionAdapter;
+pub use canvas::CanvasResolutionAdapter;
+pub use transform::TransformResolutionAdapter;
