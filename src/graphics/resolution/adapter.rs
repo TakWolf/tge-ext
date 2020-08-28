@@ -12,7 +12,7 @@ pub trait ResolutionAdapter {
 
     fn scale_factor(&self) -> Vector;
 
-    fn viewport(&self) -> Viewport;
+    fn window_viewport(&self) -> Viewport;
 
     fn set_canvas_viewport(&self, graphics: &mut Graphics, viewport: Option<impl Into<Viewport>>);
 

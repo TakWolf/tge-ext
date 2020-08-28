@@ -64,8 +64,8 @@ impl ResolutionAdapter for CanvasResolutionAdapter {
         self.params.scale_factor
     }
 
-    fn viewport(&self) -> Viewport {
-        self.params.viewport
+    fn window_viewport(&self) -> Viewport {
+        self.params.window_viewport
     }
 
     fn set_canvas_viewport(&self, graphics: &mut Graphics, viewport: Option<impl Into<Viewport<f32>>>) {
@@ -100,7 +100,7 @@ impl ResolutionAdapter for CanvasResolutionAdapter {
             None,
             Transform::default()
                 .scale(self.params.scale_factor)
-                .translate(self.params.viewport.position()),
+                .translate(self.params.window_viewport.position()),
         );
         self.locked = false;
     }

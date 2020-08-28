@@ -66,20 +66,20 @@ impl ResolutionAdapter for TransformResolutionAdapter {
         self.params.scale_factor
     }
 
-    fn viewport(&self) -> Viewport {
-        self.params.viewport
+    fn window_viewport(&self) -> Viewport {
+        self.params.window_viewport
     }
 
     fn set_canvas_viewport(&self, graphics: &mut Graphics, viewport: Option<impl Into<Viewport<f32>>>) {
         let viewport = viewport.map(|viewport| {
             let viewport = viewport.into();
             Viewport::new(
-                viewport.x * self.params.scale_factor.x + self.params.viewport.x,
-                viewport.y * self.params.scale_factor.y + self.params.viewport.y,
+                viewport.x * self.params.scale_factor.x + self.params.window_viewport.x,
+                viewport.y * self.params.scale_factor.y + self.params.window_viewport.y,
                 viewport.width * self.params.scale_factor.x,
                 viewport.height * self.params.scale_factor.y,
             )
-        }).unwrap_or(self.params.viewport);
+        }).unwrap_or(self.params.window_viewport);
         graphics.set_viewport(Some(viewport));
     }
 
@@ -95,7 +95,7 @@ impl ResolutionAdapter for TransformResolutionAdapter {
         assert!(!self.locked, "`end()` must be called after `begin()`");
         self.measure(graphics);
         self.locked = true;
-        graphics.set_viewport(Some(self.params.viewport));
+        graphics.set_viewport(Some(self.params.window_viewport));
         graphics.set_transform(self.transform);
     }
 
