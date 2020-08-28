@@ -44,6 +44,15 @@ impl App {
                 .color(Color::BLACK),
             None,
         );
+        let canvas_size = self.resolution_adapter.canvas_size();
+        engine.graphics().draw_sprite(
+            TextureRef::None,
+            SpriteDrawParams::default()
+                .region((0.0, 0.0, canvas_size.width - 10.0, canvas_size.height - 10.0))
+                .color(Color::new(0.0, 0.0, 1.0, 0.2)),
+            Transform::default()
+                .translate((5.0, 5.0)),
+        );
         if let Some(position) = engine.mouse().position() {
             let position = self.resolution_adapter.convert_to_canvas_position(position);
             engine.graphics().draw_sprite(
@@ -68,9 +77,9 @@ impl Game for App {
     }
 
     fn render(&mut self, engine: &mut Engine) -> GameResult {
-        engine.graphics().clear(Color::new(0.4, 0.4, 0.4, 1.0));
+        engine.graphics().clear(Color::BLACK);
         self.resolution_adapter.begin(engine.graphics());
-        self.resolution_adapter.clear(engine.graphics(), Color::BLACK);
+        self.resolution_adapter.clear(engine.graphics(), Color::WHITE);
         self.draw_scene(engine)?;
         self.resolution_adapter.end(engine.graphics());
         Ok(())
