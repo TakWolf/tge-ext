@@ -8,7 +8,7 @@ pub struct ResolutionAdaptParams {
 }
 
 impl ResolutionAdaptParams {
-    pub fn convert_to_canvas_position(&self, window_position: impl Into<LogicalPosition>) -> Position<f32> {
+    pub fn convert_to_canvas_position(&self, window_position: impl Into<LogicalPosition>) -> Position {
         let window_position = window_position.into();
         Position::new(
             (window_position.x - self.window_viewport.x) / self.scale_factor.x,
@@ -16,7 +16,7 @@ impl ResolutionAdaptParams {
         )
     }
 
-    pub fn convert_to_window_position(&self, canvas_position: impl Into<Position<f32>>) -> LogicalPosition {
+    pub fn convert_to_window_position(&self, canvas_position: impl Into<Position>) -> LogicalPosition {
         let canvas_position = canvas_position.into();
         Position::new(
             canvas_position.x * self.scale_factor.x + self.window_viewport.x,
