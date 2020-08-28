@@ -14,9 +14,9 @@ pub trait ResolutionAdapter {
 
     fn viewport(&self) -> Viewport;
 
-    fn clear(&self, graphics: &mut Graphics, color: impl Into<Color>);
-
     fn begin(&mut self, graphics: &mut Graphics);
+
+    fn clear(&self, graphics: &mut Graphics, color: impl Into<Color>);
 
     fn end(&mut self, graphics: &mut Graphics);
 }

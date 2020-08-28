@@ -68,16 +68,16 @@ impl ResolutionAdapter for CanvasResolutionAdapter {
         self.params.viewport
     }
 
-    fn clear(&self, graphics: &mut Graphics, color: impl Into<Color>) {
-        assert!(self.locked, "`clear()` can only be called after `begin()` and before `end()`");
-        graphics.clear(color);
-    }
-
     fn begin(&mut self, graphics: &mut Graphics) {
         assert!(!self.locked, "`end()` must be called after `begin()`");
         self.measure(graphics);
         self.locked = true;
         graphics.set_canvas(Some(&self.canvas));
+    }
+
+    fn clear(&self, graphics: &mut Graphics, color: impl Into<Color>) {
+        assert!(self.locked, "`clear()` can only be called after `begin()` and before `end()`");
+        graphics.clear(color);
     }
 
     fn end(&mut self, graphics: &mut Graphics) {
