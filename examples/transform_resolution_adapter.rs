@@ -6,7 +6,6 @@ use tge_ext::graphics::*;
 const TITLE: &str = "Transform Resolution Adapter";
 
 mod res {
-    pub const TEXTURE_NONE: &str = "texture_none";
     pub const TEXTURE_SKY: &str = "assets/sky.png";
     pub const FONT_ROBOTO: &str = "assets/Roboto/Roboto-Regular.ttf";
 }
@@ -15,7 +14,6 @@ struct App {
     registry: AssetRegistry,
     design_size: Size,
     resolution_adapter: TransformResolutionAdapter,
-    cursor: Sprite,
 }
 
 impl App {
@@ -26,14 +24,10 @@ impl App {
             .build();
         let design_size = Size::new(320.0, 256.0);
         let resolution_adapter = TransformResolutionAdapter::new(engine.graphics(), ResolutionPolicy::Normal);
-        let mut cursor = Sprite::new(res::TEXTURE_NONE, (0.0, 0.0, 8.0, 8.0));
-        cursor.set_origin((4.0, 4.0));
-        cursor.set_color(Color::RED);
         Ok(Self {
             registry,
             design_size,
             resolution_adapter,
-            cursor,
         })
     }
 
@@ -52,12 +46,15 @@ impl App {
         );
         if let Some(position) = engine.mouse().position() {
             let position = self.resolution_adapter.convert_to_canvas_position(position);
-            self.cursor.draw(
-                engine.graphics(),
-                &self.registry,
+            engine.graphics().draw_sprite(
+                TextureRef::None,
+                SpriteDrawParams::default()
+                    .region((0.0, 0.0, 8.0, 8.0))
+                    .origin((4.0, 4.0))
+                    .color(Color::RED),
                 Transform::default()
                     .translate(position),
-            )?;
+            );
         }
         Ok(())
     }
@@ -85,11 +82,6 @@ impl Game for App {
 }
 
 impl EventHandler for App {
-    fn on_window_resize(&mut self, engine: &mut Engine, _: LogicalSize) -> GameResult<()> {
-        self.resolution_adapter.measure(engine.graphics());
-        Ok(())
-    }
-
     fn on_keyboard_input(&mut self, _: &mut Engine, key: KeyCode, action: KeyAction, repeated: bool) -> GameResult<()> {
         if action == KeyAction::Down && !repeated {
             match key {
