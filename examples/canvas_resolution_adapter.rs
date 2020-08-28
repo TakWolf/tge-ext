@@ -1,4 +1,5 @@
 use tge::prelude::*;
+use tge_ext::event::*;
 use tge_ext::asset::*;
 use tge_ext::graphics::*;
 
@@ -35,37 +36,8 @@ impl App {
             cursor,
         })
     }
-}
 
-impl Game for App {
-    fn update(&mut self, engine: &mut Engine) -> GameResult {
-        let title = format!("{} - FPS: {}", TITLE, engine.timer().real_time_fps().round());
-        engine.window().set_title(title);
-
-        if engine.keyboard().is_key_down(KeyCode::Num1) {
-            self.resolution_adapter.set_policy(ResolutionPolicy::Normal);
-        } else if engine.keyboard().is_key_down(KeyCode::Num2) {
-            self.resolution_adapter.set_policy(ResolutionPolicy::Center(self.design_size));
-        } else if engine.keyboard().is_key_down(KeyCode::Num3) {
-            self.resolution_adapter.set_policy(ResolutionPolicy::Stretch(self.design_size));
-        } else if engine.keyboard().is_key_down(KeyCode::Num4) {
-            self.resolution_adapter.set_policy(ResolutionPolicy::Inside(self.design_size));
-        } else if engine.keyboard().is_key_down(KeyCode::Num5) {
-            self.resolution_adapter.set_policy(ResolutionPolicy::Crop(self.design_size));
-        } else if engine.keyboard().is_key_down(KeyCode::Num6) {
-            self.resolution_adapter.set_policy(ResolutionPolicy::FixedWidth(self.design_size.width));
-        } else if engine.keyboard().is_key_down(KeyCode::Num7) {
-            self.resolution_adapter.set_policy(ResolutionPolicy::FixedHeight(self.design_size.height));
-        }
-
-        Ok(())
-    }
-
-    fn render(&mut self, engine: &mut Engine) -> GameResult {
-        engine.graphics().clear(Color::BLACK);
-        self.resolution_adapter.begin(engine.graphics());
-        self.resolution_adapter.clear(engine.graphics(), Color::BLUE);
-
+    fn draw_scene(&mut self, engine: &mut Engine) -> GameResult {
         engine.graphics().draw_sprite(
             self.registry.texture(res::TEXTURE_SKY)?,
             None,
@@ -87,8 +59,50 @@ impl Game for App {
                     .translate(position),
             )?;
         }
+        Ok(())
+    }
+}
 
+impl Game for App {
+    fn update(&mut self, engine: &mut Engine) -> GameResult {
+        let title = format!("{} - FPS: {}", TITLE, engine.timer().real_time_fps().round());
+        engine.window().set_title(title);
+        Ok(())
+    }
+
+    fn render(&mut self, engine: &mut Engine) -> GameResult {
+        engine.graphics().clear(Color::new(0.4, 0.4, 0.4, 1.0));
+        self.resolution_adapter.begin(engine.graphics());
+        self.resolution_adapter.clear(engine.graphics(), Color::BLACK);
+        self.draw_scene(engine)?;
         self.resolution_adapter.end(engine.graphics());
+        Ok(())
+    }
+
+    fn event(&mut self, engine: &mut Engine, event: Event) -> GameResult<bool> {
+        self.handle_event(engine, event)
+    }
+}
+
+impl EventHandler for App {
+    fn on_window_resize(&mut self, engine: &mut Engine, _: LogicalSize) -> GameResult<()> {
+        self.resolution_adapter.measure(engine.graphics());
+        Ok(())
+    }
+
+    fn on_keyboard_input(&mut self, _: &mut Engine, key: KeyCode, action: KeyAction, repeated: bool) -> GameResult<()> {
+        if action == KeyAction::Down && !repeated {
+            match key {
+                KeyCode::Num1 => self.resolution_adapter.set_policy(ResolutionPolicy::Normal),
+                KeyCode::Num2 => self.resolution_adapter.set_policy(ResolutionPolicy::Center(self.design_size)),
+                KeyCode::Num3 => self.resolution_adapter.set_policy(ResolutionPolicy::Stretch(self.design_size)),
+                KeyCode::Num4 => self.resolution_adapter.set_policy(ResolutionPolicy::Inside(self.design_size)),
+                KeyCode::Num5 => self.resolution_adapter.set_policy(ResolutionPolicy::Crop(self.design_size)),
+                KeyCode::Num6 => self.resolution_adapter.set_policy(ResolutionPolicy::FixedWidth(self.design_size.width)),
+                KeyCode::Num7 => self.resolution_adapter.set_policy(ResolutionPolicy::FixedHeight(self.design_size.height)),
+                _ => (),
+            }
+        }
         Ok(())
     }
 }
