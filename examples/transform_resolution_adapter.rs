@@ -5,6 +5,7 @@ use tge_ext::graphics::*;
 const TITLE: &str = "Transform Resolution Adapter";
 
 mod res {
+    pub const TEXTURE_NONE: &str = "texture_none";
     pub const TEXTURE_SKY: &str = "assets/sky.png";
     pub const FONT_ROBOTO: &str = "assets/Roboto/Roboto-Regular.ttf";
 }
@@ -13,6 +14,7 @@ struct App {
     registry: AssetRegistry,
     design_size: Size,
     resolution_adapter: TransformResolutionAdapter,
+    cursor: Sprite,
 }
 
 impl App {
@@ -23,10 +25,13 @@ impl App {
             .build();
         let design_size = Size::new(320.0, 256.0);
         let resolution_adapter = TransformResolutionAdapter::new(engine.graphics(), ResolutionPolicy::Normal);
+        let mut cursor = Sprite::new(res::TEXTURE_NONE, (0.0, 0.0, 8.0, 8.0));
+        cursor.set_color(Color::RED);
         Ok(Self {
             registry,
             design_size,
             resolution_adapter,
+            cursor,
         })
     }
 }
@@ -72,6 +77,14 @@ impl Game for App {
                 .color(Color::BLACK),
             None,
         );
+        if let Some(position) = engine.mouse().position() {
+            self.cursor.draw(
+                engine.graphics(),
+                &self.registry,
+                Transform::default()
+                    .translate(position),
+            )?;
+        }
 
         self.resolution_adapter.end(engine.graphics());
         Ok(())
