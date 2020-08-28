@@ -14,7 +14,7 @@ impl TransformResolutionAdapter {
         let graphics_size = graphics.size();
         let params = policy.calculate_params(graphics_size);
         let transform = Transform::default()
-            .scale(params.canvas_scale);
+            .scale(params.scale_factor);
         Self {
             policy,
             graphics_size,
@@ -27,9 +27,9 @@ impl TransformResolutionAdapter {
     fn invalidate_params(&mut self) {
         let params = self.policy.calculate_params(self.graphics_size);
         if self.params != params {
-            if self.params.canvas_scale != params.canvas_scale {
+            if self.params.scale_factor != params.scale_factor {
                 self.transform = Transform::default()
-                    .scale(params.canvas_scale);
+                    .scale(params.scale_factor);
             }
             self.params = params;
         }
@@ -62,12 +62,33 @@ impl ResolutionAdapter for TransformResolutionAdapter {
         self.params.canvas_size
     }
 
-    fn canvas_scale(&self) -> Vector {
-        self.params.canvas_scale
+    fn scale_factor(&self) -> Vector {
+        self.params.scale_factor
     }
 
     fn viewport(&self) -> Viewport {
         self.params.viewport
+    }
+
+    fn set_canvas_viewport(&self, graphics: &mut Graphics, viewport: Option<impl Into<Viewport<f32>>>) {
+        let viewport = viewport.map(|viewport| {
+            let viewport = viewport.into();
+            Viewport::new(
+                viewport.x * self.params.scale_factor.x + self.params.viewport.x,
+                viewport.y * self.params.scale_factor.y + self.params.viewport.y,
+                viewport.width * self.params.scale_factor.x,
+                viewport.height * self.params.scale_factor.y,
+            )
+        }).unwrap_or(self.params.viewport);
+        graphics.set_viewport(Some(viewport));
+    }
+
+    fn convert_window_position_to_canvas_position(&self, position: impl Into<LogicalPosition>) -> Position<f32> {
+        unimplemented!()
+    }
+
+    fn convert_canvas_position_to_window_position(&self, position: impl Into<Position<f32>>) -> LogicalPosition {
+        unimplemented!()
     }
 
     fn begin(&mut self, graphics: &mut Graphics) {
@@ -87,6 +108,7 @@ impl ResolutionAdapter for TransformResolutionAdapter {
                 .color(color),
             None,
         );
+        graphics.flush();
     }
 
     fn end(&mut self, graphics: &mut Graphics) {
