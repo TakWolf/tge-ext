@@ -72,12 +72,12 @@ impl ResolutionAdapter for CanvasResolutionAdapter {
         graphics.set_viewport(viewport);
     }
 
-    fn convert_window_position_to_canvas_position(&self, position: impl Into<LogicalPosition>) -> Position<f32> {
-        unimplemented!()
+    fn convert_to_canvas_position(&self, window_position: impl Into<LogicalPosition>) -> Position<f32> {
+        self.params.convert_to_canvas_position(window_position)
     }
 
-    fn convert_canvas_position_to_window_position(&self, position: impl Into<Position<f32>>) -> LogicalPosition {
-        unimplemented!()
+    fn convert_to_window_position(&self, canvas_position: impl Into<Position<f32>>) -> LogicalPosition {
+        self.params.convert_to_window_position(canvas_position)
     }
 
     fn begin(&mut self, graphics: &mut Graphics) {

@@ -26,6 +26,7 @@ impl App {
         let design_size = Size::new(320.0, 256.0);
         let resolution_adapter = CanvasResolutionAdapter::new(engine.graphics(), ResolutionPolicy::Normal)?;
         let mut cursor = Sprite::new(res::TEXTURE_NONE, (0.0, 0.0, 8.0, 8.0));
+        cursor.set_origin((4.0, 4.0));
         cursor.set_color(Color::RED);
         Ok(Self {
             registry,
@@ -78,6 +79,7 @@ impl Game for App {
             None,
         );
         if let Some(position) = engine.mouse().position() {
+            let position = self.resolution_adapter.convert_to_canvas_position(position);
             self.cursor.draw(
                 engine.graphics(),
                 &self.registry,
