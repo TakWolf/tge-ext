@@ -70,37 +70,27 @@ impl ResolutionAdapter for TransformResolutionAdapter {
         self.params.window_viewport
     }
 
-    fn canvas_viewport(&self, graphics: &mut Graphics) -> Viewport<f32> {
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    fn canvas_viewport(&self, graphics: &mut Graphics) -> Viewport {
+        let window_viewport = graphics.viewport();
+        Viewport::new(
+            (window_viewport.x - self.params.window_viewport.x) / self.params.scale_factor.x,
+            (window_viewport.y - self.params.window_viewport.y) / self.params.scale_factor.y,
+            window_viewport.width / self.params.scale_factor.x,
+            window_viewport.height / self.params.scale_factor.y,
+        )
     }
 
-    fn set_canvas_viewport(&self, graphics: &mut Graphics, viewport: Option<impl Into<Viewport>>) {
-        let viewport = viewport.map(|viewport| {
-            let viewport = viewport.into();
+    fn set_canvas_viewport(&self, graphics: &mut Graphics, canvas_viewport: Option<impl Into<Viewport>>) {
+        let window_viewport = canvas_viewport.map(|canvas_viewport| {
+            let canvas_viewport = canvas_viewport.into();
             Viewport::new(
-                viewport.x * self.params.scale_factor.x + self.params.window_viewport.x,
-                viewport.y * self.params.scale_factor.y + self.params.window_viewport.y,
-                viewport.width * self.params.scale_factor.x,
-                viewport.height * self.params.scale_factor.y,
+                canvas_viewport.x * self.params.scale_factor.x + self.params.window_viewport.x,
+                canvas_viewport.y * self.params.scale_factor.y + self.params.window_viewport.y,
+                canvas_viewport.width * self.params.scale_factor.x,
+                canvas_viewport.height * self.params.scale_factor.y,
             )
         }).unwrap_or(self.params.window_viewport);
-        graphics.set_viewport(Some(viewport));
+        graphics.set_viewport(Some(window_viewport));
     }
 
     fn convert_to_canvas_position(&self, window_position: impl Into<LogicalPosition>) -> Position {

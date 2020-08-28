@@ -16,7 +16,7 @@ pub trait ResolutionAdapter {
 
     fn canvas_viewport(&self, graphics: &mut Graphics) -> Viewport;
 
-    fn set_canvas_viewport(&self, graphics: &mut Graphics, viewport: Option<impl Into<Viewport>>);
+    fn set_canvas_viewport(&self, graphics: &mut Graphics, canvas_viewport: Option<impl Into<Viewport>>);
 
     fn convert_to_canvas_position(&self, window_position: impl Into<LogicalPosition>) -> Position;
 
