@@ -4,9 +4,9 @@ use tge::prelude::*;
 
 #[derive(Clone)]
 pub struct Frame {
-    pub res_name: String,
-    pub region: Region,
-    pub origin: Position,
+    res_name: String,
+    region: Region,
+    origin: Position,
 }
 
 impl Frame {
@@ -43,5 +43,29 @@ impl Frame {
     pub fn split_by_texture_ref(provider: &impl TextureRefProvider, res_name: impl AsRef<str>, cols: usize, rows: usize, origin: impl Into<Position>) -> GameResult<Vec<Self>> {
         let region = get_texture_region(provider, &res_name)?;
         Ok(Self::split(region, region, cols, rows, origin))
+    }
+
+    pub fn res_name(&self) -> &str {
+        &self.res_name
+    }
+
+    pub fn set_res_name(&mut self, res_name: impl Into<String>) {
+        self.res_name = res_name.into();
+    }
+
+    pub fn region(&self) -> Region {
+        self.region
+    }
+
+    pub fn set_region(&mut self, region: impl Into<Region>) {
+        self.region = region.into();
+    }
+
+    pub fn origin(&self) -> Position {
+        self.origin
+    }
+
+    pub fn set_origin(&mut self, origin: impl Into<Position>) {
+        self.origin = origin.into();
     }
 }
