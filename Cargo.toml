@@ -14,7 +14,7 @@ publish = false
 
 [dependencies]
 # tge = "0.0.3"
-tge = { git = "https://github.com/TakWolf/tge.git", rev = "03b73cd" }
+tge = { git = "https://github.com/TakWolf/tge.git", rev = "1ccf377" }
 
 [dev-dependencies]
 rand = "0.7.3"
