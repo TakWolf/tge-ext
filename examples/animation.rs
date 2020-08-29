@@ -11,7 +11,9 @@ mod res {
 
 struct App {
     registry: AssetRegistry,
-    animation_coin: Animation,
+    animation_coin_normal: Animation,
+    animation_coin_reversed: Animation,
+    animation_coin_ping_pong: Animation,
     animation_role_1: Animation,
     animation_role_2: Animation,
     animation_role_3: Animation,
@@ -23,13 +25,20 @@ impl App {
             .load::<Texture>(engine, res::TEXTURE_COIN)?
             .load::<Texture>(engine, res::TEXTURE_CHARACTERS)?
             .build();
-        let animation_coin = Animation::by_fps(10.0, Frame::split(res::TEXTURE_COIN, (0.0, 0.0, 128.0, 16.0), 8, 1, Position::zero()));
+        let mut animation_coin_normal = Animation::by_fps(10.0, Frame::split(res::TEXTURE_COIN, (0.0, 0.0, 128.0, 16.0), 8, 1, Position::zero()));
+        animation_coin_normal.set_play_mode(PlayMode::Normal);
+        let mut animation_coin_reversed = Animation::by_fps(10.0, Frame::split(res::TEXTURE_COIN, (0.0, 0.0, 128.0, 16.0), 8, 1, Position::zero()));
+        animation_coin_reversed.set_play_mode(PlayMode::Reversed);
+        let mut animation_coin_ping_pong = Animation::by_fps(10.0, Frame::split(res::TEXTURE_COIN, (0.0, 0.0, 128.0, 16.0), 8, 1, Position::zero()));
+        animation_coin_ping_pong.set_play_mode(PlayMode::PingPong);
         let animation_role_1 = Animation::by_fps(6.0, Frame::split(res::TEXTURE_CHARACTERS, (0.0, 0.0, 128.0, 32.0), 4, 1, Position::zero()));
         let animation_role_2 = Animation::by_fps(8.0, Frame::split(res::TEXTURE_CHARACTERS, (0.0, 32.0, 128.0, 32.0), 4, 1, Position::zero()));
         let animation_role_3 = Animation::by_fps(12.0, Frame::split(res::TEXTURE_CHARACTERS, (0.0, 64.0, 128.0, 32.0), 4, 1, Position::zero()));
         Ok(Self {
             registry,
-            animation_coin,
+            animation_coin_normal,
+            animation_coin_reversed,
+            animation_coin_ping_pong,
             animation_role_1,
             animation_role_2,
             animation_role_3,
@@ -42,7 +51,9 @@ impl Game for App {
         let title = format!("{} - FPS: {}", TITLE, engine.timer().real_time_fps().round());
         engine.window().set_title(title);
 
-        self.animation_coin.update(engine.timer().delta_time());
+        self.animation_coin_normal.update(engine.timer().delta_time());
+        self.animation_coin_reversed.update(engine.timer().delta_time());
+        self.animation_coin_ping_pong.update(engine.timer().delta_time());
         self.animation_role_1.update(engine.timer().delta_time());
         self.animation_role_2.update(engine.timer().delta_time());
         self.animation_role_3.update(engine.timer().delta_time());
@@ -53,12 +64,26 @@ impl Game for App {
     fn render(&mut self, engine: &mut Engine) -> GameResult {
         engine.graphics().clear(Color::BLACK);
 
-        self.animation_coin.draw(
+        self.animation_coin_normal.draw(
             engine.graphics(),
             &self.registry,
             Transform::default()
                 .scale((4.0, 4.0))
                 .translate((128.0, 32.0)),
+        )?;
+        self.animation_coin_reversed.draw(
+            engine.graphics(),
+            &self.registry,
+            Transform::default()
+                .scale((4.0, 4.0))
+                .translate((192.0, 32.0)),
+        )?;
+        self.animation_coin_ping_pong.draw(
+            engine.graphics(),
+            &self.registry,
+            Transform::default()
+                .scale((4.0, 4.0))
+                .translate((256.0, 32.0)),
         )?;
         self.animation_role_1.draw(
             engine.graphics(),
