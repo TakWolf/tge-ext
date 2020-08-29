@@ -50,7 +50,7 @@ impl App {
             TextureRef::None,
             SpriteDrawParams::default()
                 .region((0.0, 0.0, canvas_size.width - 10.0, canvas_size.height - 10.0))
-                .color(Color::new(0.0, 0.0, 1.0, 0.2)),
+                .color((0.0, 0.0, 1.0, 0.2)),
             Transform::default()
                 .translate((5.0, 5.0)),
         );
