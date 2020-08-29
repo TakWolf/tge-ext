@@ -5,7 +5,7 @@ use std::time::Duration;
 
 #[derive(Clone)]
 pub struct Animation {
-    fps: f32,
+    frame_duration: Duration,
     frames: Vec<Frame>,
     current_index: usize,
     since_last_frame: Duration,
@@ -13,9 +13,9 @@ pub struct Animation {
 }
 
 impl Animation {
-    pub fn new(fps: f32, frames: Vec<Frame>) -> Self {
+    pub fn new(frame_duration: Duration, frames: Vec<Frame>) -> Self {
         Self {
-            fps,
+            frame_duration,
             frames,
             current_index: 0,
             since_last_frame: Duration::new(0, 0),
@@ -23,12 +23,24 @@ impl Animation {
         }
     }
 
+    pub fn by_fps(fps: f32, frames: Vec<Frame>) -> Self {
+        Self::new(Duration::from_secs_f32(1.0 / fps), frames)
+    }
+
+    pub fn frame_duration(&self) -> Duration {
+        self.frame_duration
+    }
+
+    pub fn set_frame_duration(&mut self, frame_duration: Duration) {
+        self.frame_duration = frame_duration;
+    }
+
     pub fn fps(&self) -> f32 {
-        self.fps
+        1.0 / self.frame_duration.as_secs_f32()
     }
 
     pub fn set_fps(&mut self, fps: f32) {
-        self.fps = fps;
+        self.frame_duration = Duration::from_secs_f32(1.0 / fps);
     }
 
     pub fn frames(&self) -> &[Frame] {
@@ -90,7 +102,7 @@ impl Animation {
 
     pub fn update(&mut self, delta_time: Duration) {
         self.since_last_frame += delta_time;
-        if self.since_last_frame.as_secs_f32() >= 1.0 / self.fps {
+        if self.since_last_frame >= self.frame_duration {
             self.since_last_frame = Duration::new(0, 0);
             self.current_index += 1;
             if self.current_index >= self.frames.len() {
