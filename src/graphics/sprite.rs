@@ -1,3 +1,4 @@
+use super::get_texture_region;
 use crate::asset::TextureRefProvider;
 use tge::prelude::*;
 
@@ -57,24 +58,6 @@ impl Sprite {
         self.color = color.into();
     }
 
-    pub fn split(&self, cols: usize, rows: usize, origin: impl Into<Position>) -> Vec<Sprite> {
-        let mut sheet = Vec::new();
-        let width = self.region.width / cols as f32;
-        let height = self.region.height / rows as f32;
-        let origin = origin.into();
-        for row in 0..rows {
-            for col in 0..cols {
-                sheet.push(Self {
-                    res_name: self.res_name.to_owned(),
-                    region: Region::new(self.region.x + col as f32 * width, self.region.y + row as f32 * height, width, height),
-                    origin,
-                    color: self.color,
-                });
-            }
-        }
-        sheet
-    }
-
     pub fn draw(&self, graphics: &mut Graphics, provider: &impl TextureRefProvider, transform: impl Into<Option<Transform>>) -> GameResult {
         graphics.draw_sprite(
             provider.texture_ref(&self.res_name)?,
@@ -86,11 +69,4 @@ impl Sprite {
         );
         Ok(())
     }
-}
-
-fn get_texture_region(provider: &impl TextureRefProvider, res_name: impl AsRef<str>) -> GameResult<Region> {
-    let texture_size = provider.texture_ref(res_name)?
-        .texture_size()
-        .ok_or_else(|| GameError::RuntimeError("no texture".into()))?;
-    Ok(Region::new(0.0, 0.0, texture_size.width as f32, texture_size.height as f32))
 }
