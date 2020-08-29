@@ -1,4 +1,4 @@
-use crate::asset::*;
+use crate::asset::TextureRefProvider;
 use tge::prelude::*;
 
 #[derive(Clone)]
@@ -19,21 +19,9 @@ impl Sprite {
         }
     }
 
-    pub fn by_texture(provider: &impl TextureProvider, res_name: impl Into<String>) -> GameResult<Self> {
+    pub fn by_texture_ref(provider: &impl TextureRefProvider, res_name: impl Into<String>) -> GameResult<Self> {
         let res_name = res_name.into();
-        let region = {
-            let size = provider.texture(&res_name)?.size();
-            Region::new(0.0, 0.0, size.width as f32, size.height as f32)
-        };
-        Ok(Self::new(res_name, region))
-    }
-
-    pub fn by_canvas(provider: &impl CanvasProvider, res_name: impl Into<String>) -> GameResult<Self> {
-        let res_name = res_name.into();
-        let region = {
-            let size = provider.canvas(&res_name)?.size();
-            Region::new(0.0, 0.0, size.width as f32, size.height as f32)
-        };
+        let region = get_texture_region(provider, &res_name)?;
         Ok(Self::new(res_name, region))
     }
 
@@ -98,4 +86,11 @@ impl Sprite {
         );
         Ok(())
     }
+}
+
+fn get_texture_region(provider: &impl TextureRefProvider, res_name: impl AsRef<str>) -> GameResult<Region> {
+    let texture_size = provider.texture_ref(res_name)?
+        .texture_size()
+        .ok_or_else(|| GameError::RuntimeError("no texture".into()))?;
+    Ok(Region::new(0.0, 0.0, texture_size.width as f32, texture_size.height as f32))
 }
