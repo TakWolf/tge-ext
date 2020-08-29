@@ -23,26 +23,10 @@ impl App {
             .load::<Texture>(engine, res::TEXTURE_COIN)?
             .load::<Texture>(engine, res::TEXTURE_CHARACTERS)?
             .build();
-        let animation_coin = Animation::new(
-            10.0,
-            Sprite::new(res::TEXTURE_COIN, (0.0, 0.0, 128.0, 16.0))
-                .split(8, 1, Position::zero()),
-        );
-        let animation_role_1 = Animation::new(
-            6.0,
-            Sprite::new(res::TEXTURE_CHARACTERS, (0.0, 0.0, 128.0, 32.0))
-                .split(4, 1, Position::zero()),
-        );
-        let animation_role_2 = Animation::new(
-            8.0,
-            Sprite::new(res::TEXTURE_CHARACTERS, (0.0, 32.0, 128.0, 32.0))
-                .split(4, 1, Position::zero()),
-        );
-        let animation_role_3 = Animation::new(
-            12.0,
-            Sprite::new(res::TEXTURE_CHARACTERS, (0.0, 64.0, 128.0, 32.0))
-                .split(4, 1, Position::zero()),
-        );
+        let animation_coin = Animation::new(10.0, Frame::split(res::TEXTURE_COIN, (0.0, 0.0, 128.0, 16.0), 8, 1, Position::zero()));
+        let animation_role_1 = Animation::new(6.0, Frame::split(res::TEXTURE_CHARACTERS, (0.0, 0.0, 128.0, 32.0), 4, 1, Position::zero()));
+        let animation_role_2 = Animation::new(8.0, Frame::split(res::TEXTURE_CHARACTERS, (0.0, 32.0, 128.0, 32.0), 4, 1, Position::zero()));
+        let animation_role_3 = Animation::new(12.0, Frame::split(res::TEXTURE_CHARACTERS, (0.0, 64.0, 128.0, 32.0), 4, 1, Position::zero()));
         Ok(Self {
             registry,
             animation_coin,

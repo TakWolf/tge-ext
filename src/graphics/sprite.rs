@@ -1,4 +1,4 @@
-use super::get_texture_region;
+use super::{Frame, get_texture_region};
 use crate::asset::TextureRefProvider;
 use tge::prelude::*;
 
@@ -68,5 +68,16 @@ impl Sprite {
             transform,
         );
         Ok(())
+    }
+}
+
+impl From<Frame> for Sprite {
+    fn from(frame: Frame) -> Self {
+        Self {
+            res_name: frame.res_name,
+            region: frame.region,
+            origin: frame.origin,
+            color: Color::WHITE,
+        }
     }
 }

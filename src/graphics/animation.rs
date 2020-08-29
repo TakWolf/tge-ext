@@ -1,4 +1,4 @@
-use super::Sprite;
+use super::Frame;
 use crate::asset::TextureRefProvider;
 use tge::prelude::*;
 use std::time::Duration;
@@ -6,18 +6,20 @@ use std::time::Duration;
 #[derive(Clone)]
 pub struct Animation {
     fps: f32,
-    frames: Vec<Sprite>,
+    frames: Vec<Frame>,
     current_index: usize,
     since_last_frame: Duration,
+    color: Color,
 }
 
 impl Animation {
-    pub fn new(fps: f32, frames: Vec<Sprite>) -> Self {
+    pub fn new(fps: f32, frames: Vec<Frame>) -> Self {
         Self {
             fps,
             frames,
             current_index: 0,
             since_last_frame: Duration::new(0, 0),
+            color: Color::WHITE,
         }
     }
 
@@ -29,15 +31,15 @@ impl Animation {
         self.fps = fps;
     }
 
-    pub fn frames(&self) -> &[Sprite] {
+    pub fn frames(&self) -> &[Frame] {
         &self.frames
     }
 
-    pub fn frames_mut(&mut self) -> &mut [Sprite] {
+    pub fn frames_mut(&mut self) -> &mut [Frame] {
         &mut self.frames
     }
 
-    pub fn set_frames(&mut self, frames: Vec<Sprite>) {
+    pub fn set_frames(&mut self, frames: Vec<Frame>) {
         self.frames = frames;
     }
 
@@ -45,19 +47,19 @@ impl Animation {
         self.frames.len()
     }
 
-    pub fn frame(&self, index: usize) -> Option<&Sprite> {
+    pub fn frame(&self, index: usize) -> Option<&Frame> {
         self.frames.get(index)
     }
 
-    pub fn frame_mut(&mut self, index: usize) -> Option<&mut Sprite> {
+    pub fn frame_mut(&mut self, index: usize) -> Option<&mut Frame> {
         self.frames.get_mut(index)
     }
 
-    pub fn current_frame(&self) -> Option<&Sprite> {
+    pub fn current_frame(&self) -> Option<&Frame> {
         self.frames.get(self.current_index)
     }
 
-    pub fn current_frame_mut(&mut self) -> Option<&mut Sprite> {
+    pub fn current_frame_mut(&mut self) -> Option<&mut Frame> {
         self.frames.get_mut(self.current_index)
     }
 
@@ -78,6 +80,14 @@ impl Animation {
         self.since_last_frame = Duration::new(0, 0);
     }
 
+    pub fn color(&self) -> Color {
+        self.color
+    }
+
+    pub fn set_color(&mut self, color: impl Into<Color>) {
+        self.color = color.into();
+    }
+
     pub fn update(&mut self, delta_time: Duration) {
         self.since_last_frame += delta_time;
         if self.since_last_frame.as_secs_f32() >= 1.0 / self.fps {
@@ -91,7 +101,14 @@ impl Animation {
 
     pub fn draw(&self, graphics: &mut Graphics, provider: &impl TextureRefProvider, transform: impl Into<Option<Transform>>) -> GameResult {
         if let Some(frame) = self.frames.get(self.current_index) {
-            frame.draw(graphics, provider, transform)?;
+            graphics.draw_sprite(
+                provider.texture_ref(&frame.res_name)?,
+                SpriteDrawParams::default()
+                    .region(frame.region)
+                    .origin(frame.origin)
+                    .color(self.color),
+                transform,
+            );
         }
         Ok(())
     }

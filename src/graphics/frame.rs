@@ -1,12 +1,11 @@
-use super::get_texture_region;
 use crate::asset::TextureRefProvider;
 use tge::prelude::*;
 
 #[derive(Clone)]
 pub struct Frame {
-    res_name: String,
-    region: Region,
-    origin: Position,
+    pub(crate) res_name: String,
+    pub(crate) region: Region,
+    pub(crate) origin: Position,
 }
 
 impl Frame {
@@ -42,7 +41,7 @@ impl Frame {
 
     pub fn split_by_texture_ref(provider: &impl TextureRefProvider, res_name: impl AsRef<str>, cols: usize, rows: usize, origin: impl Into<Position>) -> GameResult<Vec<Self>> {
         let region = get_texture_region(provider, &res_name)?;
-        Ok(Self::split(region, region, cols, rows, origin))
+        Ok(Self::split(res_name, region, cols, rows, origin))
     }
 
     pub fn res_name(&self) -> &str {
@@ -68,4 +67,11 @@ impl Frame {
     pub fn set_origin(&mut self, origin: impl Into<Position>) {
         self.origin = origin.into();
     }
+}
+
+pub fn get_texture_region(provider: &impl TextureRefProvider, res_name: impl AsRef<str>) -> GameResult<Region> {
+    let texture_size = provider.texture_ref(res_name)?
+        .texture_size()
+        .ok_or_else(|| GameError::RuntimeError("no texture".into()))?;
+    Ok(Region::new(0.0, 0.0, texture_size.width as f32, texture_size.height as f32))
 }
