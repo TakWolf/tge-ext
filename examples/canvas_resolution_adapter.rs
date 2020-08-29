@@ -32,9 +32,11 @@ impl App {
     }
 
     fn draw_scene(&mut self, engine: &mut Engine) -> GameResult {
+        let canvas_size = self.resolution_adapter.canvas_size();
         engine.graphics().draw_sprite(
             self.registry.texture(res::TEXTURE_SKY)?,
-            None,
+            SpriteDrawParams::default()
+                .region((0.0, 0.0, canvas_size.width, canvas_size.height)),
             None,
         );
         engine.graphics().draw_text(
@@ -44,7 +46,6 @@ impl App {
                 .color(Color::BLACK),
             None,
         );
-        let canvas_size = self.resolution_adapter.canvas_size();
         engine.graphics().draw_sprite(
             TextureRef::None,
             SpriteDrawParams::default()
