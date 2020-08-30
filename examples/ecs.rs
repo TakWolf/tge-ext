@@ -1,8 +1,9 @@
 use tge::prelude::*;
 use tge_ext::asset::*;
 use tge_ext::graphics::*;
+use legion::*;
 
-const TITLE: &str = "Tank";
+const TITLE: &str = "ECS";
 
 mod res {
     pub const FONT_ROBOTO: &str = "assets/Roboto/Roboto-Regular.ttf";
@@ -13,6 +14,7 @@ mod res {
 struct App {
     registry: AssetRegistry,
     resolution_adapter: TransformResolutionAdapter,
+    world: World,
 }
 
 impl App {
@@ -23,9 +25,11 @@ impl App {
             .load::<Texture>(engine, res::TEXTURE_TANK_TURRENT)?
             .build();
         let resolution_adapter = TransformResolutionAdapter::new(engine.graphics(), ResolutionPolicy::Inside(Size::new(1024.0, 600.0)));
+        let world = World::default();
         Ok(Self {
             registry,
             resolution_adapter,
+            world,
         })
     }
 
