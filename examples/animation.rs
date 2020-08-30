@@ -31,9 +31,12 @@ impl App {
         animation_coin_reversed.set_play_mode(PlayMode::Reversed);
         let mut animation_coin_ping_pong = Animation::by_fps(10.0, Frame::split(res::TEXTURE_COIN, (0.0, 0.0, 128.0, 16.0), 8, 1, Position::zero()));
         animation_coin_ping_pong.set_play_mode(PlayMode::PingPong);
-        let animation_role_1 = Animation::by_fps(6.0, Frame::split(res::TEXTURE_CHARACTERS, (0.0, 0.0, 128.0, 32.0), 4, 1, Position::zero()));
-        let animation_role_2 = Animation::by_fps(8.0, Frame::split(res::TEXTURE_CHARACTERS, (0.0, 32.0, 128.0, 32.0), 4, 1, Position::zero()));
-        let animation_role_3 = Animation::by_fps(12.0, Frame::split(res::TEXTURE_CHARACTERS, (0.0, 64.0, 128.0, 32.0), 4, 1, Position::zero()));
+        let mut animation_role_1 = Animation::by_fps(6.0, Frame::split(res::TEXTURE_CHARACTERS, (0.0, 0.0, 128.0, 32.0), 4, 1, Position::zero()));
+        animation_role_1.set_repeat_count(RepeatCount::Infinite);
+        let mut animation_role_2 = Animation::by_fps(6.0, Frame::split(res::TEXTURE_CHARACTERS, (0.0, 32.0, 128.0, 32.0), 4, 1, Position::zero()));
+        animation_role_2.set_repeat_count(RepeatCount::Count(4));
+        let mut animation_role_3 = Animation::by_fps(6.0, Frame::split(res::TEXTURE_CHARACTERS, (0.0, 64.0, 128.0, 32.0), 4, 1, Position::zero()));
+        animation_role_3.set_repeat_count(RepeatCount::Count(1));
         Ok(Self {
             registry,
             animation_coin_normal,
@@ -57,6 +60,11 @@ impl Game for App {
         self.animation_role_1.update(engine.timer().delta_time());
         self.animation_role_2.update(engine.timer().delta_time());
         self.animation_role_3.update(engine.timer().delta_time());
+        if engine.mouse().is_button_down(MouseButton::Left) {
+            self.animation_role_1.reset();
+            self.animation_role_2.reset();
+            self.animation_role_3.reset();
+        }
 
         Ok(())
     }

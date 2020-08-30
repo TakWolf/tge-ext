@@ -16,6 +16,18 @@ impl Default for PlayMode {
     }
 }
 
+#[derive(Debug, Copy, Clone, Hash, Eq, PartialEq)]
+pub enum RepeatCount {
+    Infinite,
+    Count(usize),
+}
+
+impl Default for RepeatCount {
+    fn default() -> Self {
+        Self::Infinite
+    }
+}
+
 #[derive(Clone)]
 pub struct Animation {
     frame_duration: Duration,
@@ -23,6 +35,8 @@ pub struct Animation {
     play_mode: PlayMode,
     current_index: usize,
     since_last_frame: Duration,
+    repeat_count: RepeatCount,
+    play_count: usize,
     color: Color,
 }
 
@@ -35,6 +49,8 @@ impl Animation {
             play_mode: PlayMode::default(),
             current_index: 0,
             since_last_frame: Duration::new(0, 0),
+            repeat_count: RepeatCount::default(),
+            play_count: 0,
             color: Color::WHITE,
         }
     }
@@ -46,6 +62,7 @@ impl Animation {
     pub fn reset(&mut self) {
         self.current_index = 0;
         self.since_last_frame = Duration::new(0, 0);
+        self.play_count = 0;
     }
 
     pub fn frame_duration(&self) -> Duration {
@@ -96,13 +113,17 @@ impl Animation {
         }
     }
 
+    pub fn reset_current_frame(&mut self) {
+        self.since_last_frame = Duration::new(0, 0);
+    }
+
     pub fn current_index(&self) -> usize {
         self.current_index
     }
 
     pub fn set_current_index(&mut self, index: usize) {
         self.current_index = index % self.one_period_frames_len();
-        self.since_last_frame = Duration::new(0, 0);
+        self.reset_current_frame();
     }
 
     pub fn current_frame_index(&self) -> usize {
@@ -123,6 +144,29 @@ impl Animation {
         self.frames.get(self.current_frame_index()).expect("wrong current index")
     }
 
+    pub fn repeat_count(&self) -> RepeatCount {
+        self.repeat_count
+    }
+
+    pub fn set_repeat_count(&mut self, repeat_count: RepeatCount) {
+        self.repeat_count = repeat_count;
+    }
+
+    pub fn play_count(&self) -> usize {
+        self.play_count
+    }
+
+    pub fn set_play_count(&mut self, play_count: usize) {
+        self.play_count = play_count;
+    }
+
+    pub fn is_finished(&self) -> bool {
+        match self.repeat_count {
+            RepeatCount::Infinite => false,
+            RepeatCount::Count(repeat_count) => self.play_count >= repeat_count,
+        }
+    }
+
     pub fn color(&self) -> Color {
         self.color
     }
@@ -132,12 +176,15 @@ impl Animation {
     }
 
     pub fn update(&mut self, delta_time: Duration) {
-        self.since_last_frame += delta_time;
-        if self.since_last_frame >= self.frame_duration {
-            self.since_last_frame = Duration::new(0, 0);
-            self.current_index += 1;
-            if self.current_index >= self.one_period_frames_len() {
-                self.current_index = 0;
+        if !self.is_finished() {
+            self.since_last_frame += delta_time;
+            if self.since_last_frame >= self.frame_duration {
+                self.since_last_frame = Duration::new(0, 0);
+                self.current_index += 1;
+                if self.current_index >= self.one_period_frames_len() {
+                    self.current_index = 0;
+                    self.play_count += 1;
+                }
             }
         }
     }
