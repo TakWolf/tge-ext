@@ -6,8 +6,8 @@ use tge_ext::graphics::*;
 const TITLE: &str = "Canvas Resolution Adapter";
 
 mod res {
-    pub const TEXTURE_SKY: &str = "assets/sky.png";
     pub const FONT_ROBOTO: &str = "assets/Roboto/Roboto-Regular.ttf";
+    pub const TEXTURE_SKY: &str = "assets/sky.png";
 }
 
 struct App {
@@ -19,8 +19,8 @@ struct App {
 impl App {
     fn new(engine: &mut Engine) -> GameResult<Self> {
         let registry = AssetRegistry::builder()
-            .load::<Texture>(engine, res::TEXTURE_SKY)?
             .load::<Font>(engine, res::FONT_ROBOTO)?
+            .load::<Texture>(engine, res::TEXTURE_SKY)?
             .build();
         let design_size = Size::new(320.0, 256.0);
         let resolution_adapter = CanvasResolutionAdapter::new(engine.graphics(), ResolutionPolicy::Inside(design_size))?;
@@ -113,7 +113,7 @@ fn main() -> GameResult {
     EngineBuilder::new()
         .window_config(WindowConfig::new()
             .title(TITLE)
-            .inner_size((800.0, 600.0)))
+            .inner_size((1024.0, 600.0)))
         .build()?
         .run_with(App::new)
 }
