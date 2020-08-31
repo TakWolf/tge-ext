@@ -58,8 +58,7 @@ fn main() -> GameResult {
     EngineBuilder::new()
         .window_config(WindowConfig::new()
             .title(TITLE)
-            .inner_size((1024.0, 600.0))
-            .maximized(true))
+            .inner_size((1024.0, 600.0)))
         .build()?
         .run_with(App::new)
 }
