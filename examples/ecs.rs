@@ -13,7 +13,6 @@ mod res {
 
 struct App {
     registry: AssetRegistry,
-    resolution_adapter: TransformResolutionAdapter,
     world: World,
 }
 
@@ -24,25 +23,11 @@ impl App {
             .load::<Texture>(engine, res::TEXTURE_TANK_BODY)?
             .load::<Texture>(engine, res::TEXTURE_TANK_TURRENT)?
             .build();
-        let resolution_adapter = TransformResolutionAdapter::new(engine.graphics(), ResolutionPolicy::Inside(Size::new(1024.0, 600.0)));
         let world = World::default();
         Ok(Self {
             registry,
-            resolution_adapter,
             world,
         })
-    }
-
-    fn draw_scene(&mut self, engine: &mut Engine) -> GameResult {
-        engine.graphics().draw_text(
-            self.registry.font(res::FONT_ROBOTO)?,
-            "Tank",
-            TextDrawParams::default()
-                .color(Color::BLACK),
-            Transform::default()
-                .translate((10.0, 10.0)),
-        );
-        Ok(())
     }
 }
 
@@ -55,10 +40,16 @@ impl Game for App {
 
     fn render(&mut self, engine: &mut Engine) -> GameResult {
         engine.graphics().clear(Color::BLACK);
-        self.resolution_adapter.begin(engine.graphics());
-        self.resolution_adapter.clear(engine.graphics(), Color::WHITE);
-        self.draw_scene(engine)?;
-        self.resolution_adapter.end(engine.graphics());
+
+        engine.graphics().draw_text(
+            self.registry.font(res::FONT_ROBOTO)?,
+            "Tank",
+            TextDrawParams::default()
+                .color(Color::BLACK),
+            Transform::default()
+                .translate((10.0, 10.0)),
+        );
+
         Ok(())
     }
 }
