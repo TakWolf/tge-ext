@@ -14,7 +14,7 @@ publish = false
 
 [dependencies]
 # tge = "0.0.3"
-tge = { git = "https://github.com/TakWolf/tge.git", rev = "176d94d" }
+tge = { git = "https://github.com/TakWolf/tge.git", rev = "e1040d9" }
 
 [dev-dependencies]
 hecs = "0.2.14"
