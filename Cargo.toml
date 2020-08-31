@@ -17,8 +17,7 @@ publish = false
 tge = { git = "https://github.com/TakWolf/tge.git", rev = "176d94d" }
 
 [dev-dependencies]
-# legion = "0.3.0"
-legion = { git = "https://github.com/TomGillen/legion.git", rev = "546fc5a" }
+hecs = "0.2.14"
 rand = "0.7.3"
 
 [profile.dev]

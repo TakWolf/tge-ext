@@ -1,7 +1,7 @@
 use tge::prelude::*;
 use tge_ext::asset::*;
 use tge_ext::graphics::*;
-use legion::*;
+use hecs::{World, EntityBuilder};
 use rand::Rng;
 
 const TITLE: &str = "ECS";
@@ -23,8 +23,7 @@ struct MovementComponent {
 fn update_movement_system(engine: &mut Engine, world: &mut World) {
     let graphics_size = engine.graphics().size();
     let delta_time_f32 = engine.timer().delta_time().as_secs_f32();
-    let mut query = <(&mut KinematicObject, &mut MovementComponent)>::query();
-    for (object, component) in query.iter_mut(world) {
+    for (_, (object, component)) in world.query::<(&mut KinematicObject, &mut MovementComponent)>().iter() {
         object.position.x += component.speed.x * delta_time_f32;
         object.position.y += component.speed.y * delta_time_f32;
         if object.position.x < 0.0 {
@@ -52,8 +51,7 @@ struct RotationComponent {
 
 fn update_rotation_system(engine: &mut Engine, world: &mut World) {
     let delta_time_f32 = engine.timer().delta_time().as_secs_f32();
-    let mut query = <(&mut KinematicObject, &mut RotationComponent)>::query();
-    for (object, component) in query.iter_mut(world) {
+    for (_, (object, component)) in world.query::<(&mut KinematicObject, &mut RotationComponent)>().iter() {
         object.angle += component.speed * delta_time_f32;
     }
 }
@@ -64,8 +62,7 @@ struct ScaleComponent {
 
 fn update_scale_system(engine: &mut Engine, world: &mut World) {
     let delta_time_f32 = engine.timer().delta_time().as_secs_f32();
-    let mut query = <(&mut KinematicObject, &mut ScaleComponent)>::query();
-    for (object, component) in query.iter_mut(world) {
+    for (_, (object, component)) in world.query::<(&mut KinematicObject, &mut ScaleComponent)>().iter() {
         object.scale += component.speed * delta_time_f32;
         if object.scale < 1.5 {
             object.scale = 1.5;
@@ -97,8 +94,7 @@ impl Role {
 }
 
 fn draw_role_system(graphics: &mut Graphics, registry: &AssetRegistry, world: &mut World) -> GameResult {
-    let mut query = <(&Role, &KinematicObject)>::query();
-    for (role, object) in query.iter(world) {
+    for (_, (role, object)) in world.query::<(&Role, &KinematicObject)>().iter() {
         role.animation.draw(
             graphics,
             registry,
@@ -123,44 +119,50 @@ impl App {
             .build();
         let mut rand = rand::thread_rng();
         let graphics_size = engine.graphics().size();
-        let mut world = World::default();
-        for _ in 0..40 {
-            let components = {
+        let mut world = World::new();
+        for _ in 0..100 {
+            let mut builder = EntityBuilder::new();
+            builder.add({
                 let number = rand.gen_range(0, 3);
+                Role::new(number)
+            });
+            builder.add({
                 let x = rand.gen_range(0.0, graphics_size.width);
                 let y = rand.gen_range(0.0, graphics_size.height);
                 let angle = rand.gen_range(0.0, std::f32::consts::PI * 2.0);
                 let scale = rand.gen_range(1.5, 3.0);
-                let role = Role::new(number);
-                let object = KinematicObject {
+                KinematicObject {
                     position: Position::new(x, y),
                     angle: Angle::radians(angle),
                     scale,
-                };
-                (role, object)
-            };
-            let entity = world.push(components);
-            if let Some(mut entry) = world.entry(entity) {
-                if rand.gen_bool(0.5) {
+                }
+            });
+            if rand.gen_bool(0.5) {
+                builder.add({
                     let speed_x = rand.gen_range(-100.0, 100.0);
                     let speed_y = rand.gen_range(-100.0, 100.0);
-                    entry.add_component(MovementComponent {
+                    MovementComponent {
                         speed: Vector::new(speed_x, speed_y),
-                    });
-                }
-                if rand.gen_bool(0.5) {
-                    let speed = rand.gen_range(-5.0, 5.0);
-                    entry.add_component(RotationComponent {
-                        speed: Angle::radians(speed),
-                    });
-                }
-                if rand.gen_bool(0.5) {
-                    let speed = rand.gen_range(-1.0, 1.0);
-                    entry.add_component(ScaleComponent {
-                        speed,
-                    });
-                }
+                    }
+                });
             }
+            if rand.gen_bool(0.5) {
+                builder.add({
+                    let speed = rand.gen_range(-5.0, 5.0);
+                    RotationComponent {
+                        speed: Angle::radians(speed),
+                    }
+                });
+            }
+            if rand.gen_bool(0.5) {
+                builder.add({
+                    let speed = rand.gen_range(-1.0, 1.0);
+                    ScaleComponent {
+                        speed,
+                    }
+                });
+            }
+            world.spawn(builder.build());
         }
         Ok(Self {
             registry,
