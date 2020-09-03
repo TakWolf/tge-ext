@@ -40,7 +40,7 @@ impl ResolutionAdapter for CanvasResolutionAdapter {
     }
 
     fn set_policy(&mut self, policy: ResolutionPolicy) {
-        assert!(!self.locked, "can not change policy after `begin()` and before `end()`");
+        assert!(!self.locked, "can not change state after `begin()` and before `end()`");
         if self.policy != policy {
             self.policy = policy;
             self.invalidate_params();
@@ -48,7 +48,7 @@ impl ResolutionAdapter for CanvasResolutionAdapter {
     }
 
     fn measure(&mut self, graphics: &mut Graphics) {
-        assert!(!self.locked, "can not measure after `begin()` and before `end()`");
+        assert!(!self.locked, "can not change state after `begin()` and before `end()`");
         let graphics_size = graphics.size();
         if self.graphics_size != graphics_size {
             self.graphics_size = graphics_size;
