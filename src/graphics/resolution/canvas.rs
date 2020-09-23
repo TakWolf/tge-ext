@@ -23,6 +23,14 @@ impl CanvasResolutionAdapter {
         })
     }
 
+    pub fn canvas_filter(&self) -> Filter {
+        self.canvas.filter()
+    }
+
+    pub fn set_canvas_filter(&mut self, filter: Filter) {
+        self.canvas.set_filter(filter)
+    }
+
     fn invalidate_params(&mut self) {
         let params = self.policy.calculate_params(self.graphics_size);
         if self.params != params {
